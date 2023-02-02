@@ -14,7 +14,6 @@ public class ControlPanel extends JPanel {
 
     // Constructor
     public ControlPanel() {
-
         bPlay= new JButton("Play");
         this.add(bPlay);
         bPause= new JButton("Pause");
@@ -23,7 +22,6 @@ public class ControlPanel extends JPanel {
         this.add(bStop);
 
         this.setBackground(Color.black);
-       
     }
 
     public ControlPanel(JButton bPlay, JButton bPause, int minObjectsALive, int maxObjectsALive) {

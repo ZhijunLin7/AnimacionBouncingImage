@@ -23,6 +23,7 @@ public class AnimationModel implements Runnable {
     public void addNewObject(ObjectTypes objectTypes) {
         AnimatedObject animatedObject = new AnimatedObject(AnimatedObjectStatus.running, objectTypes, this);
         animatedObjects.add(animatedObject);
+        this.start(animatedObject);
     }
 
     public int[][] getStatistics() {
@@ -32,35 +33,39 @@ public class AnimationModel implements Runnable {
     public synchronized void pause() {
         if (this.animationStatus.equals(AnimationStatus.running)) {
             this.animationStatus = AnimationStatus.paused;
-
+            for (AnimatedObject animatedObject : animatedObjects) {
+                animatedObject.setAnimatedObjectStatus(AnimatedObjectStatus.paused);
+            }
         }
     }
 
     public synchronized void stop() {
         this.animationStatus = AnimationStatus.stopped;
+        for (AnimatedObject animatedObject : animatedObjects) {
+            animatedObject.setAnimatedObjectStatus(AnimatedObjectStatus.stopped);
+        }
     }
 
     public synchronized void play() {
         if (this.animationStatus.equals(AnimationStatus.paused)) {
             this.animationStatus = AnimationStatus.running;
+            for (AnimatedObject animatedObject : animatedObjects) {
+                animatedObject.setAnimatedObjectStatus(AnimatedObjectStatus.running);
+            }
             notifyAll();
         } else if (this.animationStatus.equals(AnimationStatus.stopped)) {
             this.animationStatus = AnimationStatus.running;
             this.animatedObjects= new ArrayList<>();
             Thread model = new Thread(this);
             model.start();
-            this.start();
             Thread viewr = new Thread(this.animationController.getAnimationView());
             viewr.start();
-            
-
         }
     }
 
-    private void start() {
-        for (AnimatedObject animatedObject : animatedObjects) {
+    private void start(AnimatedObject animatedObject) {
             new Thread(animatedObject).start();
-        }
+        
     }
 
     public void setController(AnimationController animationController) {
@@ -69,8 +74,9 @@ public class AnimationModel implements Runnable {
 
     @Override
     public void run() {
-        while (animatedObjects.size() < minObjectsALive) {
+        while (getAnimatedObjects().size() < minObjectsALive) {
             Random random = new Random();
+            System.out.println("generado");
             switch (random.nextInt(4)) {
                 case 0:
                     addNewObject(ObjectTypes.zombie);
@@ -84,11 +90,14 @@ public class AnimationModel implements Runnable {
                 case 3:
                     addNewObject(ObjectTypes.dog);
                     break;
-
+            }
+            try {
+                Thread.sleep(800);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
         }
-        start();
-
     }
 
     // Getter y setter

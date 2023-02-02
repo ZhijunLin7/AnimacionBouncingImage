@@ -81,18 +81,22 @@ public class AnimationView extends JFrame implements Runnable, ActionListener {
     // Metodo
     public void refresh(ArrayList<AnimatedObject> animatedObjects) {
         ArrayList<AnimatedObject> runningObjects = new ArrayList<>();
+        ArrayList<AnimatedObject> deadObjects = new ArrayList<>();
 
         for (AnimatedObject animatedObject : animatedObjects) {
-            if (animatedObject.getAnimatedObjectStatus().equals(AnimatedObjectStatus.running) ||
-                    animatedObject.getAnimatedObjectStatus().equals(AnimatedObjectStatus.paused)) {
-
+            if (animatedObject.getAnimatedObjectStatus().equals(AnimatedObjectStatus.running)) {
                 animatedObject.setCanvaHeight(viewer.getHeight());
                 animatedObject.setCanvaWith(viewer.getWidth());
                 runningObjects.add(animatedObject);
+            }else if (animatedObject.getAnimatedObjectStatus().equals(AnimatedObjectStatus.dead)) {
+                deadObjects.add(animatedObject);
             }
         }
         for (int i = 0; i < runningObjects.size(); i++) {
             runningObjects.get(i).drawObject(viewer.getGraphics());
+        }
+        for (int i = 0; i < deadObjects.size(); i++) {
+            deadObjects.remove(i);
         }
     }
 
@@ -106,7 +110,7 @@ public class AnimationView extends JFrame implements Runnable, ActionListener {
 
     @Override
     public void run() {
-        while (this.animationController.getAnimationModel().getAnimationStatus() != AnimationStatus.stopped) {
+        while (this.animationController.getAnimationModel().getAnimationStatus() != AnimationStatus.stopped ) {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
@@ -127,11 +131,9 @@ public class AnimationView extends JFrame implements Runnable, ActionListener {
             case "Play":
                 this.animationController.play();
                 break;
-
             case "Pause":
             this.animationController.pause();
                 break;
-
             case "Stop":
             this.animationController.stop();
                 break;

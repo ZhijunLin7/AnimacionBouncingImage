@@ -9,6 +9,7 @@ public class StatisticsPanel extends JPanel {
     // Atributos
     private int numObjects;
     private JTable jTable;
+    private DefaultTableModel model;
 
     // Constructor
     public StatisticsPanel() {
@@ -16,7 +17,7 @@ public class StatisticsPanel extends JPanel {
         this.jTable = new JTable(
                 new DefaultTableModel(new Object[] { "Column 1", "Column 2", "Column 3", "Column 4", "Column 5" }, 0));
 
-        DefaultTableModel model = (DefaultTableModel) jTable.getModel();
+        this.model = (DefaultTableModel) jTable.getModel();
 
         String[] columnNames = { "", "Running", "Paused", "Stoped", "Dead" };
         String[] zombie = { "zombie", "", "", "", "" };
@@ -61,6 +62,14 @@ public class StatisticsPanel extends JPanel {
 
     public void setjTable(JTable jTable) {
         this.jTable = jTable;
+    }
+
+    public synchronized DefaultTableModel getModel() {
+        return model;
+    }
+
+    public synchronized void setModel(DefaultTableModel model) {
+        this.model = model;
     }
 
 }

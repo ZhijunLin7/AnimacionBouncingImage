@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
+import javax.swing.table.DefaultTableModel;
 
 import java.awt.Graphics;
 
@@ -45,6 +46,21 @@ public class AnimatedObject extends VisualObject implements Runnable {
     }
 
     private synchronized void addToStatistics() {
+        AnimatedObject.statistics = new int[4][4];
+        switch (objectTypes) {
+            case zombie:
+                this.estado(statistics[0]);
+                break;
+            case alien:
+                this.estado(statistics[1]);
+                break;
+            case soldier:
+                this.estado(statistics[2]);
+                break;
+            case dog:
+                this.estado(statistics[3]);
+                break;
+        }
 
     }
 
@@ -74,56 +90,82 @@ public class AnimatedObject extends VisualObject implements Runnable {
     }
 
     public synchronized void updateStatistics() {
+        
 
+    }
+
+    public void estado(int[] statistics) {
+        switch (this.animatedObjectStatus) {
+            case running:
+                statistics[0] += 1;
+                break;
+            case paused:
+                statistics[1] += 1;
+                break;
+            case stopped:
+                statistics[2] += 1;
+                break;
+            case dead:
+                statistics[3] += 1;
+                break;
+        }
     }
 
     @Override
     public void run() {
 
         Random random = new Random();
-        super.getPosition().setX(random.nextInt(700));
-        super.getPosition().setY(random.nextInt(700));
+        super.getPosition().setX(random.nextInt(50));
+        super.getPosition().setY(random.nextInt(50));
 
-        while (this.animationModel.getAnimationStatus() != AnimationStatus.stopped) {
-            int y = super.getPosition().getY();
-            int x = super.getPosition().getX();
-            if (x > getCanvaWith() - 80) {
-                move_left = true;
-            }
-            if (x < 0) {
-                move_left = false;
-            }
-
-            if (move_left) {
-                x -= 1;
-            } else {
-                x += 1;
-            }
-
-            if (y > getCanvaHeight() - 110) {
-                move_up = true;
-            }
-            if (y < 0) {
-                move_up = false;
-            }
-            if (move_up) {
-                y -= 1;
-            } else {
-                y += 1;
-            }
-
-            super.getPosition().setX(x);
-            super.getPosition().setY(y);
-
+        while (this.animationModel.getAnimationStatus() != AnimationStatus.stopped
+                && this.animatedObjectStatus != AnimatedObjectStatus.dead) {
+            this.mover();
+            addToStatistics();
+            updateStatistics();
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-
         }
 
+    }
+
+    public void mover() {
+        int y = super.getPosition().getY();
+        int x = super.getPosition().getX();
+        if (x > getCanvaWith() - 80) {
+            move_left = true;
+            if (x > (getCanvaWith() + 80)) {
+                this.animatedObjectStatus = AnimatedObjectStatus.dead;
+            }
+        }
+        if (x < 0) {
+            move_left = false;
+        }
+        if (move_left) {
+            x -= 1;
+        } else {
+            x += 1;
+        }
+        if (y > getCanvaHeight() - 110) {
+            move_up = true;
+            if (y > (getCanvaHeight() + 110)) {
+                this.animatedObjectStatus = AnimatedObjectStatus.dead;
+            }
+        }
+        if (y < 0) {
+            move_up = false;
+        }
+        if (move_up) {
+            y -= 1;
+        } else {
+            y += 1;
+        }
+        super.getPosition().setX(x);
+        super.getPosition().setY(y);
     }
 
     // Getter y setter
