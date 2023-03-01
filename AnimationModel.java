@@ -10,6 +10,7 @@ public class AnimationModel implements Runnable {
     private ArrayList<AnimatedObject> animatedObjects;
     private AnimationController animationController;
 
+
     // Constructor
     public AnimationModel(AnimationStatus animationStatus, int minObjectsALive, int maxObjectsALive) {
         this.animationStatus = animationStatus;
@@ -34,15 +35,20 @@ public class AnimationModel implements Runnable {
         if (this.animationStatus.equals(AnimationStatus.running)) {
             this.animationStatus = AnimationStatus.paused;
             for (AnimatedObject animatedObject : animatedObjects) {
-                animatedObject.setAnimatedObjectStatus(AnimatedObjectStatus.paused);
+                if (animatedObject.getAnimatedObjectStatus()!= AnimatedObjectStatus.dead) {
+                    animatedObject.setAnimatedObjectStatus(AnimatedObjectStatus.paused);
+                }
             }
         }
     }
 
     public synchronized void stop() {
+        notifyAll();
         this.animationStatus = AnimationStatus.stopped;
-        for (AnimatedObject animatedObject : animatedObjects) {
-            animatedObject.setAnimatedObjectStatus(AnimatedObjectStatus.stopped);
+        for (int i = 0; i < animatedObjects.size(); i++) {
+            if (animatedObjects.get(i).getAnimatedObjectStatus()!= AnimatedObjectStatus.stopped) {
+                this.animatedObjects.get(i).setAnimatedObjectStatus(AnimatedObjectStatus.stopped);
+            }
         }
     }
 
@@ -50,12 +56,14 @@ public class AnimationModel implements Runnable {
         if (this.animationStatus.equals(AnimationStatus.paused)) {
             this.animationStatus = AnimationStatus.running;
             for (AnimatedObject animatedObject : animatedObjects) {
-                animatedObject.setAnimatedObjectStatus(AnimatedObjectStatus.running);
+                if (animatedObject.getAnimatedObjectStatus()!= AnimatedObjectStatus.dead) {
+                    animatedObject.setAnimatedObjectStatus(AnimatedObjectStatus.running);
+                }
             }
             notifyAll();
         } else if (this.animationStatus.equals(AnimationStatus.stopped)) {
             this.animationStatus = AnimationStatus.running;
-            this.animatedObjects= new ArrayList<>();
+            this.animatedObjects = new ArrayList<>();
             Thread model = new Thread(this);
             model.start();
             Thread viewr = new Thread(this.animationController.getAnimationView());
@@ -64,8 +72,8 @@ public class AnimationModel implements Runnable {
     }
 
     private void start(AnimatedObject animatedObject) {
-            new Thread(animatedObject).start();
-        
+        Thread t = new Thread(animatedObject);
+        t.start();
     }
 
     public void setController(AnimationController animationController) {
@@ -74,25 +82,33 @@ public class AnimationModel implements Runnable {
 
     @Override
     public void run() {
-        while (getAnimatedObjects().size() < minObjectsALive) {
-            Random random = new Random();
-            System.out.println("generado");
-            switch (random.nextInt(4)) {
-                case 0:
-                    addNewObject(ObjectTypes.zombie);
-                    break;
-                case 1:
-                    addNewObject(ObjectTypes.alien);
-                    break;
-                case 2:
-                    addNewObject(ObjectTypes.soldier);
-                    break;
-                case 3:
-                    addNewObject(ObjectTypes.dog);
-                    break;
+        while (true) {
+            int numalive=0;
+            for (AnimatedObject animatedObject : animatedObjects) {
+                if (animatedObject.getAnimatedObjectStatus()!=AnimatedObjectStatus.dead) {
+                    numalive+=1;
+                }
+            }
+            if (numalive<getMaxObjectsALive()) {
+                Random random = new Random();
+                System.out.println("generado");
+                switch (random.nextInt(4)) {
+                    case 0:
+                        addNewObject(ObjectTypes.zombie);
+                        break;
+                    case 1:
+                        addNewObject(ObjectTypes.alien);
+                        break;
+                    case 2:
+                        addNewObject(ObjectTypes.soldier);
+                        break;
+                    case 3:
+                        addNewObject(ObjectTypes.dog);
+                        break;
+                }
             }
             try {
-                Thread.sleep(800);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

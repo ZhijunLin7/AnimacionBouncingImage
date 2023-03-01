@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
-import javax.swing.table.DefaultTableModel;
 
 import java.awt.Graphics;
 
@@ -45,23 +44,25 @@ public class AnimatedObject extends VisualObject implements Runnable {
         }
     }
 
-    private synchronized void addToStatistics() {
-        AnimatedObject.statistics = new int[4][4];
-        switch (objectTypes) {
-            case zombie:
-                this.estado(statistics[0]);
-                break;
-            case alien:
-                this.estado(statistics[1]);
-                break;
-            case soldier:
-                this.estado(statistics[2]);
-                break;
-            case dog:
-                this.estado(statistics[3]);
-                break;
+    public synchronized void addToStatistics() {
+        int[][] estadistic = new int[4][4];
+        for (AnimatedObject object : this.animationModel.getAnimatedObjects()) {
+            switch (object.objectTypes) {
+                case zombie:
+                    this.estado(estadistic[0],object);
+                    break;
+                case alien:
+                    this.estado(estadistic[1],object);
+                    break;
+                case soldier:
+                    this.estado(estadistic[2],object);
+                    break;
+                case dog:
+                    this.estado(estadistic[3],object);
+                    break;
+            }
         }
-
+        AnimatedObject.statistics = estadistic;
     }
 
     @Override
@@ -90,23 +91,22 @@ public class AnimatedObject extends VisualObject implements Runnable {
     }
 
     public synchronized void updateStatistics() {
-        
 
     }
 
-    public void estado(int[] statistics) {
-        switch (this.animatedObjectStatus) {
+    public void estado(int[] estadistic,AnimatedObject object) {
+        switch (object.animatedObjectStatus) {
             case running:
-                statistics[0] += 1;
+                estadistic[0] += 1;
                 break;
             case paused:
-                statistics[1] += 1;
+                estadistic[1] += 1;
                 break;
             case stopped:
-                statistics[2] += 1;
+                estadistic[2] += 1;
                 break;
             case dead:
-                statistics[3] += 1;
+                estadistic[3] += 1;
                 break;
         }
     }
@@ -115,14 +115,13 @@ public class AnimatedObject extends VisualObject implements Runnable {
     public void run() {
 
         Random random = new Random();
-        super.getPosition().setX(random.nextInt(50));
-        super.getPosition().setY(random.nextInt(50));
+        super.getPosition().setX(random.nextInt(800));
+        super.getPosition().setY(random.nextInt(800));
 
         while (this.animationModel.getAnimationStatus() != AnimationStatus.stopped
                 && this.animatedObjectStatus != AnimatedObjectStatus.dead) {
             this.mover();
-            addToStatistics();
-            updateStatistics();
+            this.addToStatistics();
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
@@ -134,13 +133,14 @@ public class AnimatedObject extends VisualObject implements Runnable {
     }
 
     public void mover() {
+        Random random = new Random();
+        if ((random.nextInt(1000)<1)) {
+            this.animatedObjectStatus=AnimatedObjectStatus.dead;
+        }
         int y = super.getPosition().getY();
         int x = super.getPosition().getX();
         if (x > getCanvaWith() - 80) {
             move_left = true;
-            if (x > (getCanvaWith() + 80)) {
-                this.animatedObjectStatus = AnimatedObjectStatus.dead;
-            }
         }
         if (x < 0) {
             move_left = false;
@@ -152,9 +152,6 @@ public class AnimatedObject extends VisualObject implements Runnable {
         }
         if (y > getCanvaHeight() - 110) {
             move_up = true;
-            if (y > (getCanvaHeight() + 110)) {
-                this.animatedObjectStatus = AnimatedObjectStatus.dead;
-            }
         }
         if (y < 0) {
             move_up = false;

@@ -1,4 +1,5 @@
 import javax.swing.JFrame;
+import javax.swing.table.DefaultTableModel;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -81,23 +82,19 @@ public class AnimationView extends JFrame implements Runnable, ActionListener {
     // Metodo
     public void refresh(ArrayList<AnimatedObject> animatedObjects) {
         ArrayList<AnimatedObject> runningObjects = new ArrayList<>();
-        ArrayList<AnimatedObject> deadObjects = new ArrayList<>();
+
 
         for (AnimatedObject animatedObject : animatedObjects) {
             if (animatedObject.getAnimatedObjectStatus().equals(AnimatedObjectStatus.running)) {
                 animatedObject.setCanvaHeight(viewer.getHeight());
                 animatedObject.setCanvaWith(viewer.getWidth());
                 runningObjects.add(animatedObject);
-            }else if (animatedObject.getAnimatedObjectStatus().equals(AnimatedObjectStatus.dead)) {
-                deadObjects.add(animatedObject);
             }
         }
         for (int i = 0; i < runningObjects.size(); i++) {
             runningObjects.get(i).drawObject(viewer.getGraphics());
         }
-        for (int i = 0; i < deadObjects.size(); i++) {
-            deadObjects.remove(i);
-        }
+
     }
 
     public int[][] getStatistics() {
@@ -119,8 +116,35 @@ public class AnimationView extends JFrame implements Runnable, ActionListener {
             }
             viewer.drawBackgroud();
             refresh(animationController.getObjects());
+            actualizarStatistica();
         }
 
+    }
+
+    public void actualizarStatistica() {
+        int [][] stat=AnimatedObject.getStatistics();
+        String[] zombie = { "zombie", "", "", "", "" };
+        String[] alien = { "alien", "", "", "", "" };
+        String[] soldier = { "soldier", "", "", "", "" };
+        String[] dog = { "dog", "", "", "", "" };
+        if (stat!=null) {
+            for (int i = 0; i < stat.length; i++) {
+                zombie[i+1]=String.valueOf(stat[0][i]);
+                alien[i+1]=String.valueOf(stat[1][i]);
+                soldier[i+1]=String.valueOf(stat[2][i]);
+                dog[i+1]=String.valueOf(stat[3][i]);
+            }
+            DefaultTableModel model=statisticsPanel.getModel();
+
+            model.removeRow(4);
+            model.removeRow(3);
+            model.removeRow(2);
+            model.removeRow(1);
+            model.addRow(zombie);
+            model.addRow(alien);
+            model.addRow(soldier);
+            model.addRow(dog);
+        }
     }
 
     @Override

@@ -50,7 +50,7 @@ public class MyTask {
     public static void main(String[] args) {
         AnimatedObject.loadObjectImages();
 
-        AnimationModel animationModel = new AnimationModel(AnimationStatus.stopped, 6, 6);
+        AnimationModel animationModel = new AnimationModel(AnimationStatus.stopped, 3, 6);
         AnimationView animationView = new AnimationView(500);
         AnimationController animationController = new AnimationController(animationModel, animationView);
 

@@ -33,8 +33,6 @@ public class StatisticsPanel extends JPanel {
 
         this.setBackground(Color.CYAN);
         this.add(jTable);
-        
-
     }
 
     public StatisticsPanel(int numObjects, JTable jTable) {
