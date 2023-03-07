@@ -21,6 +21,11 @@ public class AnimationView extends JFrame implements Runnable, ActionListener {
         this.statisticsPanel = new StatisticsPanel();
         this.controlPanel = new ControlPanel();
         this.viewer = new Viewer();
+        this.setDefaultCloseOperation(3);
+        this.setSize(1200, 600);
+        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        this.setTitle("Animation");
+        this.setVisible(true);
 
         // Configurar el layout
         GridBagLayout gridBagLayout = new GridBagLayout();
@@ -62,13 +67,7 @@ public class AnimationView extends JFrame implements Runnable, ActionListener {
         c.gridheight = 2;
         this.add(viewer, c);
 
-        this.setDefaultCloseOperation(3);
-        this.setSize(1200, 600);
-        this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        this.setTitle("Animation");
-        this.setVisible(true);
-
-        viewer.paint(getGraphics());
+        viewer.createBufferStrategy(2);
 
     }
 
@@ -93,7 +92,7 @@ public class AnimationView extends JFrame implements Runnable, ActionListener {
         }
         for (int i = 0; i < runningObjects.size(); i++) {
             int imagen=runningObjects.get(i).drawObject();
-            viewer.getGraphics().drawImage(AnimatedObject.getObjectImages()[imagen], runningObjects.get(i).getPosition().getX(),
+            viewer.getBufferStrategy().getDrawGraphics().drawImage(AnimatedObject.getObjectImages()[imagen], runningObjects.get(i).getPosition().getX(),
             runningObjects.get(i).getPosition().getY(), 80, 110, null);
         }
 
@@ -116,9 +115,10 @@ public class AnimationView extends JFrame implements Runnable, ActionListener {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            viewer.drawBackgroud();
+            viewer.drawBackgroud(viewer.getBufferStrategy().getDrawGraphics());
             refresh(animationController.getObjects());
             actualizarStatistica();
+            viewer.getBufferStrategy().show();
         }
 
     }

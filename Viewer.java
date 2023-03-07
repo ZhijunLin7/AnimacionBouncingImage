@@ -28,8 +28,7 @@ public class Viewer extends Canvas {
     }
 
     // Metodo
-    public void drawBackgroud() {
-        Graphics g = this.getGraphics();
+    public void drawBackgroud(Graphics g) {
         if (g==null) {
             System.out.println("No existe manejador de imagen");
         }
@@ -37,10 +36,7 @@ public class Viewer extends Canvas {
         
     }
 
-    @Override
-    public void paint(Graphics g) {
-        this.drawBackgroud();
-    }
+
 
     // Getter y setter
     public void setBackground(Image background) {
