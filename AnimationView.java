@@ -92,7 +92,9 @@ public class AnimationView extends JFrame implements Runnable, ActionListener {
             }
         }
         for (int i = 0; i < runningObjects.size(); i++) {
-            runningObjects.get(i).drawObject(viewer.getGraphics());
+            int imagen=runningObjects.get(i).drawObject();
+            viewer.getGraphics().drawImage(AnimatedObject.getObjectImages()[imagen], runningObjects.get(i).getPosition().getX(),
+            runningObjects.get(i).getPosition().getY(), 80, 110, null);
         }
 
     }

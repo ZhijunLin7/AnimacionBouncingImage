@@ -65,25 +65,24 @@ public class AnimatedObject extends VisualObject implements Runnable {
         AnimatedObject.statistics = estadistic;
     }
 
-    @Override
-    public synchronized void drawObject(Graphics g) {
+    public synchronized int drawObject() {
         ObjectTypes objectTypes = this.getObjectTypes();
-        Image image = null;
+        int image = -1;
         switch (objectTypes) {
             case zombie:
-                image = AnimatedObject.getObjectImages()[0];
+                image = 0;
                 break;
             case soldier:
-                image = AnimatedObject.getObjectImages()[1];
+                image = 1;
                 break;
             case dog:
-                image = AnimatedObject.getObjectImages()[2];
+                image = 2;
                 break;
             case alien:
-                image = AnimatedObject.getObjectImages()[3];
+                image = 3;
                 break;
         }
-        g.drawImage(image, super.getPosition().getX(), super.getPosition().getY(), 80, 110, null);
+        return image;
     }
 
     public synchronized void removeFromStatistics(AnimationStatus animationStatus) {
